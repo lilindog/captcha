@@ -2,7 +2,9 @@
 
 const 
 { createReadStream, unlink, existsSync, mkdirSync } = require("fs"),
-{ exec } = require("child_process");
+{ exec, execSync } = require("child_process");
+
+let EXEC_NAME = "";
 
 main.option = {
     colors: ["red", "blue", "pink", "green", "grey"],
@@ -31,6 +33,18 @@ const getName = (function () {
         return (index++) + suffix;
     }
 })();
+
+function getExecName () {
+    try {
+        execSync("magick -version");
+        return "magick ";
+    } catch(err) {}
+    try {
+        execSync("convert -version");
+        return "convert ";
+    } catch(err) {}
+    err("请先安装 ImageMagick");
+}
 
 function fillOptionChars () {
     for (let i = 0; i < 26; i++) {
@@ -67,7 +81,7 @@ function getRandomWidth () {
 }
 
 async function buildStaticCaptcha (option = {}, text = "", name = "") {
-    let cmd = `magick -size ${option.width}x${option.height} xc:"${option.background}" `;
+    let cmd = `${EXEC_NAME} -size ${option.width}x${option.height} xc:"${option.background}" `;
     for (let i = 0; i < option.point; i++) cmd += ` -fill ${getRandomColor(option.colors)} -draw "point ${getRandomWidth()},${getRandomHeight()}" `;
     for (let i = 0; i < option.line; i++) cmd += ` -fill ${getRandomColor(option.colors)} -draw "line ${getRandomWidth()},${getRandomHeight()},${getRandomWidth()},${getRandomHeight()}" `;
     let 
@@ -90,7 +104,7 @@ async function main (option = {}) {
     for (let i = 0; i < 2; i++) names.push(getName(".jpg"));
     for (let i = 0; i < 5; i++) text += getRandomChar(option.chars);
     for (let name of names) await buildStaticCaptcha(option, text, name);
-    let cmd = `magick -delay 15 -loop 0 `, gifname = getName(".gif");
+    let cmd = `${EXEC_NAME} -delay 15 -loop 0 `, gifname = getName(".gif");
     names.forEach(name => cmd += ` ${path(name)} `);
     await runCmds([cmd + path(gifname)]);
     const stream = createReadStream(path(gifname));
@@ -106,5 +120,6 @@ module.exports = (option = {}) => {
     Object.assign(main.option, option);
     (!main.option.chars || !main.option.chars.length) && fillOptionChars();
     !existsSync(path("")) && mkdirSync(path(""));
+    EXEC_NAME = getExecName();
     return main;
 }
