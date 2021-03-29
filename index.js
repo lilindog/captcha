@@ -50,12 +50,12 @@ function getRange (min, max) {
     return min + (max + 1 - min) * Math.random() | 0;
 }
 
-function getRandomColor () {
-    return main.option.colors[getRange(0, main.option.colors.length - 1)];
+function getRandomColor (colors = []) {
+    return colors[getRange(0, colors.length - 1)];
 }
 
-function getRandomChar () {
-    return main.option.chars[getRange(0, main.option.chars.length - 1)];
+function getRandomChar (chars = []) {
+    return chars[getRange(0, chars.length - 1)];
 }
 
 function getRandomHeight () {
@@ -68,8 +68,8 @@ function getRandomWidth () {
 
 async function buildStaticCaptcha (option = {}, text = "", name = "") {
     let cmd = `magick -size ${option.width}x${option.height} xc:"${option.background}" `;
-    for (let i = 0; i < option.point; i++) cmd += ` -fill ${getRandomColor()} -draw "point ${getRandomWidth()},${getRandomHeight()}" `;
-    for (let i = 0; i < option.line; i++) cmd += ` -fill ${getRandomColor()} -draw "line ${getRandomWidth()},${getRandomHeight()},${getRandomWidth()},${getRandomHeight()}" `;
+    for (let i = 0; i < option.point; i++) cmd += ` -fill ${getRandomColor(option.colors)} -draw "point ${getRandomWidth()},${getRandomHeight()}" `;
+    for (let i = 0; i < option.line; i++) cmd += ` -fill ${getRandomColor(option.colors)} -draw "line ${getRandomWidth()},${getRandomHeight()},${getRandomWidth()},${getRandomHeight()}" `;
     let 
     textWidth = option.width / text.length,
     left = 0;
@@ -78,17 +78,17 @@ async function buildStaticCaptcha (option = {}, text = "", name = "") {
         size = textWidth, 
         spaceLR = (textWidth - size) / 2;
         left += spaceLR;
-        cmd += ` -fill ${getRandomColor()} -pointsize ${size} -draw "skewX ${getRange(-10, 10)} text ${left},${getRange(size, option.height)} '${text[i]}'" `;
+        cmd += ` -fill ${getRandomColor(option.colors)} -pointsize ${size} -draw "skewX ${getRange(-10, 10)} text ${left},${getRange(size, option.height)} '${text[i]}'" `;
         left += spaceLR + size;
     }
     await runCmds([cmd + path(name)]);
 }
 
 async function main (option = {}) {
-    Object.assign(option, main.option);
+    option = Object.assign({}, main.option, option);
     let names = [], text = "";
     for (let i = 0; i < 2; i++) names.push(getName(".jpg"));
-    for (let i = 0; i < 5; i++) text += getRandomChar();
+    for (let i = 0; i < 5; i++) text += getRandomChar(option.chars);
     for (let name of names) await buildStaticCaptcha(option, text, name);
     let cmd = `magick -delay 15 -loop 0 `, gifname = getName(".gif");
     names.forEach(name => cmd += ` ${path(name)} `);
