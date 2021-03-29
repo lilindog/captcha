@@ -1,0 +1,8 @@
+{
+  "name": "captcha",
+  "version": "0.0.1",
+  "description": "基于ImageMagick 的nodejs验证码模块",
+  "main": "index.js",
+  "author": "lilindog <lilin@lilin.site>",
+  "license": "ISC"
+}

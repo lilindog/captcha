@@ -1,5 +1,5 @@
 const { createServer } = require("http");
-const captcha = require("./index")();
+const captcha = require("../index")({ line: 10 });
 
 createServer(async (req, res) =>{
     const { code, stream } = await  captcha();
