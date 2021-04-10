@@ -1,30 +1,30 @@
 "use strict"
 
 const 
-{ createReadStream, unlink, existsSync, mkdirSync } = require("fs"),
-{ exec, execSync } = require("child_process");
+    { createReadStream, unlink, existsSync, mkdirSync } = require("fs"),
+    { exec, execSync } = require("child_process");
 
 let EXEC_NAME = "";
 
-main.option = {
+const defaultOption = {
     colors: ["red", "blue", "pink", "green", "grey"],
     height: 40,
-    width: 100,
-    chars: [],
-    line: 3,
-    point: 50,
+    width:  100,
+    chars:  [],
+    line:   3,
+    point:  50,
     background: "#fff"
 }
 
 function noop () {}
 
-function path (file) { 
-    return __dirname + "/.temp/" + file; 
-}
+const path = file => __dirname + "/.temp/" + file;
 
-function err (msg = "") { 
-    throw `[ Captcha ] 报错：${msg}` 
-}
+const err = msg => { throw `[ Captcha ] 报错：${msg}`; };
+
+const range = (min, max) => min + (max + 1 - min) * Math.random() | 0;
+
+const random = value => (Object.prototype.toString.call(value) === "[object Array]") ? value[range(0, value.length - 1)] : range(0, value);
 
 const getName = (function () {
     let index = 0;
@@ -34,24 +34,24 @@ const getName = (function () {
     }
 })();
 
-function getExecName () {
+function setExecName () {
     try {
         execSync("magick -version");
-        return "magick ";
+        return EXEC_NAME = "magick ";
     } catch(err) {}
     try {
         execSync("convert -version");
-        return "convert ";
+        return EXEC_NAME = "convert ";
     } catch(err) {}
     err("请先安装 ImageMagick");
 }
 
-function fillOptionChars () {
+function fillOptionChars (option) {
     for (let i = 0; i < 26; i++) {
         const letter = String.fromCharCode(65 + i);
-        main.option.chars.push(letter, letter.toLocaleLowerCase());
+        option.chars.push(letter, letter.toLocaleLowerCase());
     }
-    for (let i = 1; i < 10; i++) main.option.chars.push(i);    
+    for (let i = 1; i < 10; i++) option.chars.push(i);    
 }
 
 async function runCmds (cmds = []) {
@@ -60,56 +60,59 @@ async function runCmds (cmds = []) {
     return codes.every(code => code === 0);
 }
 
-function getRange (min, max) {
-    return min + (max + 1 - min) * Math.random() | 0;
-}
-
-function getRandomColor (colors = []) {
-    return colors[getRange(0, colors.length - 1)];
-}
-
-function getRandomChar (chars = []) {
-    return chars[getRange(0, chars.length - 1)];
-}
-
-function getRandomHeight () {
-    return getRange(0, main.option.height);
-}
-
-function getRandomWidth () {
-    return getRange(0, main.option.width);
-}
-
-async function buildStaticCaptcha (option = {}, text = "", name = "") {
-    let cmd = `${EXEC_NAME} -size ${option.width}x${option.height} xc:"${option.background}" `;
-    for (let i = 0; i < option.point; i++) cmd += ` -fill ${getRandomColor(option.colors)} -draw "point ${getRandomWidth()},${getRandomHeight()}" `;
-    for (let i = 0; i < option.line; i++) cmd += ` -fill ${getRandomColor(option.colors)} -draw "line ${getRandomWidth()},${getRandomHeight()},${getRandomWidth()},${getRandomHeight()}" `;
+async function captcha (
+    { 
+        height,
+        width,
+        background,
+        colors,
+        line,
+        point
+    }, 
+    text = "", 
+    name = ""
+) {
+    const textWidth = width / text.length;
     let 
-    textWidth = option.width / text.length,
-    left = 0;
-    for (let i = 0; i < text.length; i++) {
+        cmd = `${EXEC_NAME} -size ${width}x${height} xc:"${background}" `,
+        i = 0,
+        left = 0;
+    for (; i < point; i++) cmd += ` -fill ${random(colors)} -draw "point ${random(width)},${random(height)}" `;
+    for (i = 0; i < line; i++) cmd += ` -fill ${random(colors)} -draw "line ${random(width)},${random(height)},${random(width)},${random(height)}" `;
+    for (i = 0; i < text.length; i++) {
         const 
         size = textWidth, 
         spaceLR = (textWidth - size) / 2;
         left += spaceLR;
-        cmd += ` -fill ${getRandomColor(option.colors)} -pointsize ${size} -draw "skewX ${getRange(-10, 10)} text ${left},${getRange(size, option.height)} '${text[i]}'" `;
+        cmd += ` -fill ${random(colors)} -pointsize ${size} -draw "skewX ${range(-10, 10)} text ${left},${range(size, height)} '${text[i]}'" `;
         left += spaceLR + size;
     }
     await runCmds([cmd + path(name)]);
 }
 
-async function main (option = {}) {
-    option = Object.assign({}, main.option, option);
-    let names = [], text = "";
-    for (let i = 0; i < 2; i++) names.push(getName(".jpg"));
-    for (let i = 0; i < 5; i++) text += getRandomChar(option.chars);
-    for (let name of names) await buildStaticCaptcha(option, text, name);
-    let cmd = `${EXEC_NAME} -delay 15 -loop 0 `, gifname = getName(".gif");
+async function main (initOption, option = {}) {
+    option = Object.assign({}, initOption, option);
+    const {
+        chars
+    } = option;
+    let 
+        names = [], 
+        text = "", 
+        i = 0,
+        name = "",
+        gifName = "",
+        cmd = "", 
+        stream;
+    for (; i < 2; i++) names.push(getName(".jpg"));
+    for (i = 0; i < 5; i++) text += random(chars);
+    for (name of names) await captcha(option, text, name);
+    cmd = `${EXEC_NAME} -delay 15 -loop 0 `;
+    gifName = getName(".gif");
     names.forEach(name => cmd += ` ${path(name)} `);
-    await runCmds([cmd + path(gifname)]);
-    const stream = createReadStream(path(gifname));
+    await runCmds([cmd + path(gifName)]);
+    stream = createReadStream(path(gifName));
     stream.on("close", () => {
-        unlink(path(gifname), noop);
+        unlink(path(gifName), noop);
         names.forEach(name => unlink(path(name), noop));
     });
     return { stream, code: text };
@@ -117,9 +120,9 @@ async function main (option = {}) {
 
 module.exports = (option = {}) => {
     if (option !== undefined && Object.prototype.toString.call(option) !== "[object Object]") err("option 必须为对象");
-    Object.assign(main.option, option);
-    (!main.option.chars || !main.option.chars.length) && fillOptionChars();
+    option = Object.assign({}, defaultOption, option);
+    (option.chars || option.chars.length) && fillOptionChars(option);
     !existsSync(path("")) && mkdirSync(path(""));
-    EXEC_NAME = getExecName();
-    return main;
+    setExecName();
+    return main.bind(null, option);
 }

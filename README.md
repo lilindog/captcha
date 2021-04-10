@@ -3,6 +3,7 @@
 
 ## 效果
 [点这里查看在线示例](http://captcha.lilin.site:8080)   
+
 ![验证码展示效果](doc/1.gif)
 ![验证码展示效果](doc/2.gif)
 ![验证码展示效果](doc/3.gif)
