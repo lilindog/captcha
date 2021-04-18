@@ -80,12 +80,9 @@ async function captcha (
     for (; i < point; i++) cmd += ` -fill ${random(colors)} -draw "point ${random(width)},${random(height)}" `;
     for (i = 0; i < line; i++) cmd += ` -fill ${random(colors)} -draw "line ${random(width)},${random(height)},${random(width)},${random(height)}" `;
     for (i = 0; i < text.length; i++) {
-        const 
-        size = textWidth, 
-        spaceLR = (textWidth - size) / 2;
-        left += spaceLR;
-        cmd += ` -fill ${random(colors)} -pointsize ${size} -draw "skewX ${range(-10, 10)} text ${left},${range(size, height)} '${text[i]}'" `;
-        left += spaceLR + size;
+        const size = textWidth;
+        cmd += ` -fill ${random(colors)} -pointsize ${range(size / 1.5, size)} -draw "skewX ${range(-5, 5)} text ${left},${range(size, height)} '${text[i]}'" `;
+        left += size;
     }
     await runCmds([cmd + path(name)]);
 }
