@@ -8,6 +8,7 @@
 ![图片看不到请翻墙](doc/1.gif)
 ![图片看不到请翻墙](doc/2.gif)
 ![图片看不到请翻墙](doc/3.gif)
+![图片看不到请翻墙](doc/4.gif)
 
 ## 使用
 代码示例：
@@ -22,6 +23,8 @@ let options = {
     chars: [],
     // 画几条干扰线
     line: 3,
+    // 画几条贝塞尔曲线
+    bezier: 2,
     // 画几个干扰点
     point: 50,
     background: "#fff"

@@ -12,6 +12,7 @@ const defaultOption = {
     width:  100,
     chars:  [],
     line:   3,
+    bezier: 1,
     point:  50,
     background: "#fff"
 }
@@ -67,6 +68,7 @@ async function captcha (
         background,
         colors,
         line,
+        bezier,
         point
     }, 
     text = "", 
@@ -84,6 +86,7 @@ async function captcha (
         cmd += ` -fill ${random(colors)} -pointsize ${range(size / 1.5, size)} -draw "text ${left},${range(size, height)} '${text[i]}'" `;
         left += size;
     }
+    for (i = 0; i < bezier; i++) cmd += ` -fill none -stroke ${random(colors)} -strokeWidth 1 -draw "bezier ${random(width)},${random(height)} ${random(width)},${random(height)} ${random(width)},${random(height)} ${random(width)},${random(height)}" `;
     await runCmds([cmd + path(name)]);
 }
 

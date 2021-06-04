@@ -3,10 +3,13 @@ const captcha = require("../index")();
 
 createServer(async (req, res) =>{
     const { code, stream } = await captcha({
-        // line: 10,
-        // point: 0,
-        // colors: ["black"],
-        // background: "#fff"
+        // height,
+        // width,
+        // background,
+        // colors,
+        line: 0,
+        bezier: 2,
+        point: 0
     });
     console.log(code);
     stream.pipe(res);
