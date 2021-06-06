@@ -8,7 +8,6 @@ exports.runCmds = async function (cmds = []) {
             cmd = cmd.replace(/\s+/g, " ").split(" ");
             const p = spawn(cmd.shift(), cmd, { stdio: "inherit", shell: platform === "win32" ? true : false });
             p.on("exit", resolve);
-            p.on("error", reject);
         }));
     }
     return codes.every(code => code === 0);

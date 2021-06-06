@@ -32,11 +32,12 @@ function writeScript (scriptPath = "") {
     let script = `
         #!/usr/bin/env node
         const { spawn } = require("child_process");
-        const p = spawn("node", ["${scriptPath}"], { stdio: "inherit" });
+        const path = require("path");
+        const p = spawn("node", [path.join(__dirname, "${scriptPath.split(path.sep).join("/")}")], { stdio: "inherit" });
         p.on("exit", code => {
             process.exit(code);
         });
     `;
-    script = script.replace(/\s+/g, " ").replace("#!/usr/bin/env node", "#!/usr/bin/env node\n");
+    script = script.replace(/\s+/g, " ").replace("#!/usr/bin/env node", "#!/usr/bin/env node\n").replace(/(?<=(?:(?:\r\n|\r|\n)|(?:^)))\s+/g, "");
     fs.writeFileSync(targetPath, script);
 }

@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 const 
     { createReadStream, unlink, existsSync, mkdirSync } = require("fs"),
@@ -15,7 +15,7 @@ const defaultOption = {
     bezier: 1,
     point:  50,
     background: "#fff"
-}
+};
 
 function noop () {}
 
@@ -32,18 +32,18 @@ const getName = (function () {
     return suffix => {
         if (index >= Number.MAX_SAFE_INTEGER) index = 0;
         return (index++) + suffix;
-    }
+    };
 })();
 
 function setExecName () {
     try {
         execSync("magick -version");
         return EXEC_NAME = "magick ";
-    } catch(err) {}
+    } catch (err) {}
     try {
         execSync("convert -version");
         return EXEC_NAME = "convert ";
-    } catch(err) {}
+    } catch (err) {}
     err("请先安装 ImageMagick");
 }
 
@@ -125,4 +125,4 @@ module.exports = (option = {}) => {
     !existsSync(path("")) && mkdirSync(path(""));
     setExecName();
     return main.bind(null, option);
-}
+};
