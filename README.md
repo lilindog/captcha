@@ -5,10 +5,10 @@
 1. [点这里查看在线示例](http://examples.lilin.site/captcha)   
 
 2. 截图   
-![图片看不到请翻墙](doc/1.gif)
-![图片看不到请翻墙](doc/2.gif)
-![图片看不到请翻墙](doc/3.gif)
-![图片看不到请翻墙](doc/4.gif)
+![图片看不到请翻墙](doc/img/1.gif)
+![图片看不到请翻墙](doc/img/2.gif)
+![图片看不到请翻墙](doc/img/3.gif)
+![图片看不到请翻墙](doc/img/4.gif)
 
 ## 使用
 代码示例：
