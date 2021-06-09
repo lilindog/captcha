@@ -7,9 +7,9 @@ createServer(async (req, res) =>{
         // width,
         // background,
         // colors,
-        line: 0,
-        bezier: 2,
-        point: 0
+        // line: 0,
+        bezier: 4,
+        // point: 10
     });
     console.log(code);
     stream.pipe(res);

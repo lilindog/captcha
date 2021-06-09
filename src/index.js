@@ -86,7 +86,7 @@ async function captcha (
         cmd += ` -fill ${random(colors)} -pointsize ${range(size / 1.5, size)} -draw "text ${left},${range(size, height)} '${text[i]}'" `;
         left += size;
     }
-    for (i = 0; i < bezier; i++) cmd += ` -fill none -stroke ${random(colors)} -strokeWidth 1 -draw "bezier ${random(width)},${random(height)} ${random(width)},${random(height)} ${random(width)},${random(height)} ${random(width)},${random(height)}" `;
+    for (i = 0; i < bezier; i++) cmd += ` -fill none -stroke ${random(colors)} -strokeWidth 1 -draw "bezier 0,${random(height)} ${random(width / 4)},${random(height)} ${random(width / 2)},${random(height)} ${width},${random(height)}" `;
     await runCmds([cmd + path(name)]);
 }
 
