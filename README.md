@@ -1,17 +1,17 @@
 # nodejs 验证码模块
-我在老早之前用的一个叫 ”gm“ 的npm包实现过验证码；这次弃用了该依赖直接对 ImageMagick 命令进行了封装。
+这是一个基于 ImageMagick 封装实现的一个nodejs验证码生成库（生成gif验证码图片）, 使用该库必须要安装ImageMagick。   
+其实我在老早之前用的一个叫 ”gm“ 的npm包实现过验证码；这次弃用了该依赖直接对 ImageMagick 命令进行了封装，依赖更少更得劲。   
 
-## 效果
-1. [点这里查看在线示例](http://examples.lilin.site/captcha)   
+## 效果展示
+[点这里查看在线示例](http://examples.lilin.site/captcha)   
 
-2. 截图   
 ![图片看不到请翻墙](doc/img/1.gif)
 ![图片看不到请翻墙](doc/img/2.gif)
 ![图片看不到请翻墙](doc/img/3.gif)
 ![图片看不到请翻墙](doc/img/4.gif)
 
-## 使用
-代码示例：
+## 使用示例
+代码示例（Javascript）：
 ```js
 // 配置，可选的
 let options = {
@@ -38,4 +38,29 @@ require("http").createServer((req, res) => {
     console.log(code);
     stream.pipe(res);
 }).listen(80, () => console.log("测试服务已启动！"))；
+```
+
+代码示例（Typescript）:   
+```ts
+// tsconfig.json
+{
+    compileOptions: {
+        // 此项开启必须
+        "esModuleInterop": true,
+        // more ...
+    }
+}
+
+// 服务器
+import captcha, { CaptchaOptions, CaptchaFunction } from "captcha";
+import http, { Server, ServerResponse, IncomingMessage } from "http";
+import { Readable } from "stream";
+const cp: CaptchaFunction = captcha();
+const app: Server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
+    const { stream, code } = await cp();
+    stream.pipe(res);
+});
+app.listen(80, () => {
+    console.log("服务运行....");
+});
 ```
